@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Countdown – Gartenaction</title>
+
+  <!-- Google Material Design (Materialize CSS) -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+        integrity="sha512-GNvV9XQfF3QeXK5FZ9m0oZfRk3+3x3k5M3qK2CjH0qv2B2u3m3H4nq2bJr8y2z0r3wI4+3y+2Hh1K8cG3xZ1xg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    html, body { height: 100%; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      background: #fafafa;
+    }
+    .wrap { text-align: center; padding: 2rem; }
+    .title { margin: 0 0 .25rem 0; font-weight: 600; letter-spacing: .04em; }
+    #countdown {
+      margin: .5rem 0 0 0;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .04em;
+      line-height: 1.1;
+      font-size: clamp(2rem, 10vw, 8rem);
+    }
+    .sub { margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <main class="wrap z-depth-1 white">
+    <h6 class="grey-text text-darken-2 title">Countdown</h6>
+    <div id="countdown" class="black-text">00:00:00</div>
+    <div class="sub grey-text text-darken-1">Gartenaction</div>
+  </main>
+
+  <script>
+    function nextSaturdayAt10() {
+      const now = new Date();
+      const target = new Date(now);
+      const day = now.getDay(); // 0=So … 6=Sa
+      let d = (6 - day + 7) % 7; // Tage bis Samstag
+      const pastTen =
+        now.getHours() > 10 ||
+        (now.getHours() === 10 && (now.getMinutes() > 0 || now.getSeconds() > 0));
+      if (d === 0 && pastTen) d = 7; // wenn heute Sa nach 10:00 → nächste Woche
+      target.setDate(now.getDate() + d);
+      target.setHours(10, 0, 0, 0);
+      return target;
+    }
+
+    const target = nextSaturdayAt10();
+
+    function pad(n) { return n.toString().padStart(2, "0"); }
+
+    function render(diffMs) {
+      if (diffMs <= 0) {
+        document.getElementById("countdown").textContent = "00:00:00";
+        return false;
+      }
+      const totalSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      const text = days > 0
+        ? `${days}d ${pad(hours)}:${pad(mins)}:${pad(secs)}`
+        : `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+      document.getElementById("countdown").textContent = text;
+      return true;
+    }
+
+    // Initial und Intervall
+    render(target - new Date());
+    const tick = setInterval(() => {
+      const ok = render(target - new Date());
+      if (!ok) clearInterval(tick);
+    }, 250);
+  </script>
+
+  <!-- Optional: Materialize JS (nicht nötig für diesen Countdown) -->
+  <script src="https://cd
